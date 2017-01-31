@@ -1,0 +1,101 @@
+﻿Imports System.Data.OleDb
+Public Class LoginForm
+    Dim DB_provider As String
+    Dim data_File As String
+    Dim connString As String
+    Dim myConn As OleDbConnection = New OleDbConnection
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        DB_provider = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source ="
+        'Change the following to your access database location
+        data_File = "C:\Users\user\Documents\SchoolWinAPPDatabase.accdb"
+        connString = DB_provider & data_File
+        myConn.ConnectionString = connString
+
+        'the query:
+        Dim cmd As OleDbCommand = New OleDbCommand("SELECT * FROM [Userinfo] WHERE [Username] = '" & TextBox1.Text & "' AND [Password] = '" & TextBox2.Text & "'", myConn)
+        Dim dr As OleDbDataReader = cmd.ExecuteReader
+        ' the following variable is hold true if user is found, and false if user is not found 
+        Dim userFound As Boolean = False
+        ' the following variables will hold the user first and last name if found.
+        Dim FirstName As String = ""
+        Dim LastName As String = ""
+
+        'if found:
+        While dr.Read
+            userFound = True
+            FirstName = dr("FirstName").ToString
+            LastName = dr("LastName").ToString
+        End While
+
+        'checking the result
+        If userFound = True Then
+            Teacher.Show()
+            Teacher.Label1.Text = "Welcome " & FirstName & " " & LastName
+        Else
+            MsgBox("Sorry, username or password not found", MsgBoxStyle.OkOnly, "Invalid Login")
+        End If
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        DB_provider = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source ="
+        'Change the following to your access database location
+        data_File = "C:\Users\user\Documents\SchoolWinAPPDatabase.accdb"
+        connString = DB_provider & data_File
+        myConn.ConnectionString = connString
+
+        'the query:
+        Dim cmd As OleDbCommand = New OleDbCommand("SELECT * FROM [Userinfo] WHERE [Username] = '" & TextBox3.Text & "' AND [Password] = '" & TextBox4.Text & "'", myConn)
+        Dim dr As OleDbDataReader = cmd.ExecuteReader
+        ' the following variable is hold true if user is found, and false if user is not found 
+        Dim userFound As Boolean = False
+        ' the following variables will hold the user first and last name if found.
+        Dim FirstName As String = ""
+        Dim LastName As String = ""
+        'Dim Privilage As String = "student"
+        'if found:
+        While dr.Read
+            userFound = True
+            FirstName = dr("FirstName").ToString
+            LastName = dr("LastName").ToString
+            'Privilage = dr("Privilage").ToString
+        End While
+
+        'checking the result
+        If userFound = True Then
+            Student.Show()
+            Student.Label1.Text = "Welcome " & FirstName & " " & LastName
+        Else
+            MsgBox("Sorry, username or password not found", MsgBoxStyle.OkOnly, "Invalid Login")
+        End If
+    End Sub
+End Class
+**************************************************************************************************************************************
+													ALTERNATIVELY
+**************************************************************************************************************************************
+' Build your connection ' 
+Using(Dim myConnection As New OleDbConnection("{your-connection-string"}))
+    ' Use parameters in your query '
+    Dim query = "SELECT * FROM [login] WHERE [ID] = ? AND Password = ?"
+    ' Build your command to execute '
+    Using(Dim myCommand As New OleDbCommand(query, myConnection))
+         ' Open your connection '
+         myConnection.Open()
+         ' Add your parameters (these will replace the ? in your query)
+         myCommand.Parameters.AddWithValue("@ID",TextBoxUsername.Text)
+         myCommand.Parameters.AddWithValue("@Password",TextBoxPassword.Text)
+         Using(Dim myReader = myCommand.ExecuteReader())
+              If myReader.HasRows Then
+                   ' Do stuff '
+                   userFound = True
+                   userID = dr("ID").ToString
+                   UserPassword = dr("Password").ToString
+                   Form2.Show()
+                   Me.Hide()
+              Else
+                   ' Do other stuff '
+                   MessageBox.Show("Invalid Username/Password")
+              End If
+         End Using
+    End Using
+End Using
